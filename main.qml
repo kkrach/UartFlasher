@@ -18,6 +18,21 @@ ApplicationWindow {
         }
     }
 
+    statusBar: StatusBar {
+    RowLayout {
+        Label {
+            id: status
+            }
+        }
+    }
+
+    signal comPortModelUpdateRequested()
+
+    function updateComPortCombo() {
+        comPortModelUpdateRequested();
+        console.log( "updateComPortCombo" )
+    }
+
 
     RowLayout {
         id: rootLayout
@@ -40,13 +55,15 @@ ApplicationWindow {
                     }
                     RowLayout {
                         ComboBox {
+                            id: comPortCombo
                             Layout.fillWidth: true
-                            model: [ "Com1", "/dev/ttyS0", "/dev/ttyS1" ]
+                            model: comPortModel.items;
                         }
                         Button {
                             id: reloadButton
                             Layout.maximumWidth: 30
                             text: qsTr( "↻" )
+                            onClicked: updateComPortCombo()
                         }
                     }
                     Text {
@@ -57,13 +74,15 @@ ApplicationWindow {
                         model: [ "115.2", "57.6", "9.6" ]
                     }
                     Text {
-                        text: qsTr("Data:")
+                        text: qsTr("Data Bits:")
                     }
-                    ComboBox {
+                    SpinBox {
                         Layout.fillWidth: true
                         enabled: false
-                        model: [ "8 bit" ]
+                        value: 8
+                        decimals: 0
                     }
+
                     Text {
                         text: qsTr("Parity:")
                     }
@@ -133,6 +152,8 @@ ApplicationWindow {
             ColumnLayout {
                 anchors.fill: parent
                 TextArea {
+                    id: protocolField
+                    readOnly: true
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                 }
