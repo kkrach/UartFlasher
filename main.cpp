@@ -1,13 +1,12 @@
-#include <QtGui/QGuiApplication>
-#include "qtquick2applicationviewer.h"
+#include <QApplication>
+#include <QQmlApplicationEngine>
 
 int main(int argc, char *argv[])
 {
-    QGuiApplication app(argc, argv);
+    QApplication app(argc, argv);
 
-    QtQuick2ApplicationViewer viewer;
-    viewer.setMainQmlFile(QStringLiteral("qml/UartFlasher/main.qml"));
-    viewer.showExpanded();
+    QQmlApplicationEngine engine;
+    engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
 
     return app.exec();
 }
