@@ -6,7 +6,8 @@ CONFIG += c++11
 
 SOURCES += main.cpp \
     StringListModel.cpp \
-    ComPortModel.cpp
+    ComPortModel.cpp \
+    SerialConnection.cpp
 
 RESOURCES += qml.qrc
 
@@ -19,4 +20,5 @@ include(deployment.pri)
 
 HEADERS += \
     StringListModel.h \
-    ComPortModel.h
+    ComPortModel.h \
+    SerialConnection.h
