@@ -1,12 +1,18 @@
 import QtQuick 2.2
 import QtQuick.Controls 1.1
 import QtQuick.Layouts 1.1
+import QtQuick.Dialogs 1.2
+import QtQuick.Window 2.1
 
 ApplicationWindow {
+    id: rootWindow
     visible: true
     width:  200     // using too small values, to get minimum window size
     height: 200     // using too small values, to get minimum window size
     title: qsTr("Uart Flasher")
+
+    x: (Screen.width  - rootWindow.width ) / 2
+    y: (Screen.height - rootWindow.height) / 2
 
     menuBar: MenuBar {
         Menu {
@@ -15,6 +21,22 @@ ApplicationWindow {
                 text: qsTr("Exit")
                 onTriggered: Qt.quit();
             }
+        }
+    }
+
+    FileDialog {
+        id: fileDialog
+        title: "Please choose a file"
+        visible: false
+        signal dialogAccepted();
+        signal dialogRejected();
+        onAccepted: {
+            dialogAccepted()
+            visible = false
+        }
+        onRejected: {
+            dialogRejected()
+            visible = false
         }
     }
 
@@ -68,6 +90,7 @@ ApplicationWindow {
                     ComboBox {
                         Layout.fillWidth: true
                         model: [ "115.2", "57.6", "9.6" ]
+                        currentIndex: 1
                     }
                     Text {
                         text: qsTr("Data Bits:")
@@ -123,11 +146,18 @@ ApplicationWindow {
                     RowLayout {
                         Layout.fillWidth: true
                         TextField {
-                            enabled: false
+                            id: transferDataUrl
                             Layout.fillWidth: true
                         }
                         Button {
                             text: qsTr( "Load" )
+                            onClicked: {
+                                fileDialog.open()
+                                fileDialog.dialogAccepted.connect(getUrlFromDialog);
+                            }
+                            function getUrlFromDialog() {
+                                transferDataUrl.text = fileDialog.fileUrl
+                            }
                         }
                     }
                     RowLayout {
