@@ -17,5 +17,6 @@ void ComPortModel::updateItems()
     {
         newItemList << serialPort.portName();
     }
+    if( newItemList.isEmpty() ) newItemList << "--none--";
     setItems( newItemList );
 }

@@ -28,10 +28,6 @@ ApplicationWindow {
 
     signal comPortModelUpdateRequested()
 
-    function updateComPortCombo() {
-        comPortModelUpdateRequested();
-        console.log( "updateComPortCombo" )
-    }
 
 
     RowLayout {
@@ -63,7 +59,7 @@ ApplicationWindow {
                             id: reloadButton
                             Layout.maximumWidth: 30
                             text: qsTr( "↻" )
-                            onClicked: updateComPortCombo()
+                            onClicked: comPortModelUpdateRequested()
                         }
                     }
                     Text {
