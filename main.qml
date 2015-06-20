@@ -4,9 +4,9 @@ import QtQuick.Layouts 1.1
 
 ApplicationWindow {
     visible: true
-    width: 640
-    height: 480
-    title: qsTr("Hello World")
+    width:  200     // using too small values, to get minimum window size
+    height: 200     // using too small values, to get minimum window size
+    title: qsTr("Uart Flasher")
 
     menuBar: MenuBar {
         Menu {
@@ -38,11 +38,17 @@ ApplicationWindow {
                     Text {
                         text: qsTr("Serial Port:")
                     }
-                    ComboBox {
-                        Layout.fillWidth: true
-                        model: [ "Com1", "/dev/ttyS0", "/dev/ttyS1" ]
+                    RowLayout {
+                        ComboBox {
+                            Layout.fillWidth: true
+                            model: [ "Com1", "/dev/ttyS0", "/dev/ttyS1" ]
+                        }
+                        Button {
+                            id: reloadButton
+                            Layout.maximumWidth: 30
+                            text: qsTr( "↻" )
+                        }
                     }
-
                     Text {
                         text: qsTr("Baud Rate:")
                     }
@@ -50,7 +56,6 @@ ApplicationWindow {
                         Layout.fillWidth: true
                         model: [ "115.2", "57.6", "9.6" ]
                     }
-
                     Text {
                         text: qsTr("Data:")
                     }
@@ -59,7 +64,6 @@ ApplicationWindow {
                         enabled: false
                         model: [ "8 bit" ]
                     }
-
                     Text {
                         text: qsTr("Parity:")
                     }
@@ -68,7 +72,6 @@ ApplicationWindow {
                         enabled: false
                         model: [ "none" ]
                     }
-
                     Text {
                         text: qsTr("CRC:")
                     }
@@ -77,7 +80,6 @@ ApplicationWindow {
                         enabled: false
                         model: [ "XOR" ]
                     }
-
                     Text {
                         text: qsTr("Trigger:")
                     }
@@ -86,7 +88,6 @@ ApplicationWindow {
                         enabled: false
                         model: [ "Start TX" ]
                     }
-
                     Text {
                         text: qsTr("Answer:")
                     }
@@ -97,9 +98,10 @@ ApplicationWindow {
                     }
                 }
             }
+
             GroupBox {
-                Layout.fillWidth: true
                 title: qsTr( "Transfer Data" )
+                Layout.fillWidth: true
 
                 ColumnLayout {
                     anchors.fill: parent
@@ -123,32 +125,27 @@ ApplicationWindow {
             }
         }
 
+        GroupBox {
+            title: qsTr( "Protocol" )
+            Layout.fillHeight: true
+            Layout.fillWidth: true
 
-        ColumnLayout {
-            GroupBox {
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-                title: qsTr( "Protocol" )
-
-                ColumnLayout {
-                    anchors.fill: parent
-                    TextArea {
-                        Layout.fillHeight: true
+            ColumnLayout {
+                anchors.fill: parent
+                TextArea {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                }
+                RowLayout {
+                    TextField {
                         Layout.fillWidth: true
                     }
-                    RowLayout {
-                        TextField {
-                            Layout.fillWidth: true
-                        }
-                        Button {
-                            text: qsTr( "Send" )
-                        }
+                    Button {
+                        id: sendButton
+                        text: qsTr( "↵" )
+                        Layout.preferredWidth: 30
                     }
                 }
-            }
-            Text {
-                Layout.fillWidth: true
-                text: qsTr( "graph" )
             }
         }
     }
