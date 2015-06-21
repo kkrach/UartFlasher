@@ -27,8 +27,12 @@ int main(int argc, char *argv[])
     {
         QObject::connect(rootObject, SIGNAL(comPortModelUpdateRequested()),
                          &comPortModel, SLOT(updateItems()));
-        QObject::connect(rootObject, SIGNAL(transferStartRequested(QString,QString,QString,int,QString,QString,QString,QString)),
+        QObject::connect(rootObject, SIGNAL(connectRequested(QString,QString,QString,int,QString,QString,QString,QString)),
                          &serialConnection, SLOT(setupConnection(QString,QString,QString,int,QString,QString,QString,QString)));
+        QObject::connect(rootObject, SIGNAL(disconnectRequested()),
+                         &serialConnection, SLOT(disconnect()));
+        QObject::connect(rootObject, SIGNAL(sendRequested(QString)),
+                         &serialConnection, SLOT(sendText(QString)));
     }
 
     return app.exec();

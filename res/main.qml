@@ -3,6 +3,7 @@ import QtQuick.Controls 1.1
 import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.2
 import QtQuick.Window 2.1
+import UartFlasher.SerialConnection 1.0
 
 ApplicationWindow {
     id: rootWindow
@@ -43,12 +44,6 @@ ApplicationWindow {
         }
     }
 
-    MessageDialog {
-        id: dataMissingDialog
-        title: qsTr( "Transfer-data Missing" )
-        text: qsTr( "Please load first the transfer-data!" )
-    }
-
     statusBar: StatusBar {
     RowLayout {
         Label {
@@ -58,8 +53,10 @@ ApplicationWindow {
     }
 
     signal comPortModelUpdateRequested()
-    signal transferStartRequested(string dataPath, string port, string baudRate, int dataBits,
-                                  string parity, string crc, string trigger, string answer)
+    signal sendRequested(string text)
+    signal connectRequested(string dataPath, string port, string baudRate, int dataBits,
+                            string parity, string crc, string trigger, string answer)
+    signal disconnectRequested()
 
 
 
@@ -109,7 +106,6 @@ ApplicationWindow {
                     SpinBox {
                         id: dataBitesSpinbox
                         Layout.fillWidth: true
-                        enabled: false
                         value: 8
                         decimals: 0
                     }
@@ -120,7 +116,6 @@ ApplicationWindow {
                     ComboBox {
                         id: parityCombo
                         Layout.fillWidth: true
-                        enabled: false
                         model: [ "none" ]
                     }
                     Text {
@@ -129,7 +124,6 @@ ApplicationWindow {
                     ComboBox {
                         id: crcCombo
                         Layout.fillWidth: true
-                        enabled: false
                         model: [ "XOR" ]
                     }
                     Text {
@@ -138,7 +132,6 @@ ApplicationWindow {
                     ComboBox {
                         id: triggerCombo
                         Layout.fillWidth: true
-                        enabled: false
                         model: [ "Start TX" ]
                     }
                     Text {
@@ -147,7 +140,6 @@ ApplicationWindow {
                     ComboBox {
                         id: answerCombo
                         Layout.fillWidth: true
-                        enabled: false
                         model: [ "Start of Header" ]
                     }
                 }
@@ -166,7 +158,9 @@ ApplicationWindow {
                             Layout.fillWidth: true
                         }
                         Button {
-                            text: qsTr( "Load" )
+                            id: loadButton
+                            text: qsTr( "✎" )
+                            Layout.maximumWidth: 30
                             onClicked: {
                                 fileDialog.open()
                                 fileDialog.dialogAccepted.connect(getUrlFromDialog);
@@ -179,18 +173,17 @@ ApplicationWindow {
                     RowLayout {
                         Layout.alignment: Qt.AlignRight
                         Button {
-                            text: qsTr( "Transfer" )
+                            id: connectButton
+                            text: qsTr( "Connect" )
                             onClicked: {
-                                if( transferDataUrl.length == 0 )
-                                {
-                                    dataMissingDialog.open()
+                                if( text === qsTr("Connect") ) {
+                                    connectRequested(transferDataUrl.text, comPortCombo.currentText,
+                                                     baudRateCombo.currentText, dataBitesSpinbox.value,
+                                                     parityCombo.currentText, crcCombo.currentText,
+                                                     triggerCombo.currentText, answerCombo.currentText)
                                 }
-                                else
-                                {
-                                    transferStartRequested(transferDataUrl.text, comPortCombo.currentText,
-                                                           baudRateCombo.currentText, dataBitesSpinbox.value,
-                                                           parityCombo.currentText, crcCombo.currentText,
-                                                           triggerCombo.currentText, answerCombo.currentText)
+                                else {
+                                    disconnectRequested()
                                 }
                             }
                         }
@@ -203,16 +196,54 @@ ApplicationWindow {
         Connections {
             target: serialConnection
             onDataReceived: {
-                protocolField.append( "" + data )
+                protocolField.insert( protocolField.length, data )
+                //protocolField.append( "" + data )
                 protocolField.cursorPosition = protocolField.length
             }
             onErrorOccurred: {
-                protocolField.append( "ERROR: " + data )
+                protocolField.append( qsTr("ERROR: ") + data )
                 protocolField.cursorPosition = protocolField.length
             }
             onStatusUpdated: {
-                protocolField.append( "STATUS: " + data )
+                protocolField.append( qsTr("STATUS: ") + data )
                 protocolField.cursorPosition = protocolField.length
+            }
+            onStatusChanged: {
+                switch( status )
+                {
+                case SerialConnection.UNKNOWN:
+                    console.error( qsTr("Received unknown status!") )
+                    break;
+                case SerialConnection.DISCONNECTED:
+                    comPortCombo.enabled = true
+                    reloadButton.enabled = true
+                    baudRateCombo.enabled = true
+                    dataBitesSpinbox.enabled = true
+                    parityCombo.enabled = true
+                    crcCombo.enabled = true
+                    triggerCombo.enabled = true
+                    answerCombo.enabled = true
+                    transferDataUrl.enabled = true
+                    loadButton.enabled = true
+                    connectButton.text = qsTr( "Connect" )
+                    status.text = ""
+                    break;
+
+                case SerialConnection.CONNECTED:
+                    comPortCombo.enabled = false
+                    reloadButton.enabled = false
+                    baudRateCombo.enabled = false
+                    dataBitesSpinbox.enabled = false
+                    parityCombo.enabled = false
+                    crcCombo.enabled = false
+                    triggerCombo.enabled = false
+                    answerCombo.enabled = false
+                    transferDataUrl.enabled = false
+                    loadButton.enabled = false
+                    connectButton.text = qsTr( "Disconnect" )
+                    status.text = qsTr( "CONNECTED" )
+                    break;
+                }
             }
         }
 
@@ -235,15 +266,20 @@ ApplicationWindow {
                 }
                 RowLayout {
                     TextField {
+                        id: sendTextField
                         Layout.fillWidth: true
+                        onEditingFinished: {
+                            sendRequested( sendTextField.text + "\n" )
+                            sendTextField.text = ""
+                        }
                     }
                     Button {
                         id: sendButton
                         text: qsTr( "↵" )
                         Layout.preferredWidth: 30
                         onClicked: {
-                            protocolField.append( "$ " + "haha" )
-                            protocolField.cursorPosition = protocolField.length
+                            sendRequested( sendTextField.text + "\n" )
+                            sendTextField.text = ""
                         }
                     }
                 }
