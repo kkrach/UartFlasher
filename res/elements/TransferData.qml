@@ -8,7 +8,7 @@ GroupBox {
     title: qsTr( "Transfer Data" )
 
     //
-    // Properties
+    // Properties / Variables
     //
     property alias transferDataUrl: transferDataUrlTextfield.text
 

@@ -6,7 +6,7 @@ GroupBox {
     title: qsTr( "Settings" )
 
     //
-    // Properties
+    // Properties / Variables
     //
     property alias comPort: comPortCombo.currentText
     property alias baudRate: baudRateCombo.currentText

@@ -4,5 +4,6 @@
         <file>elements/Settings.qml</file>
         <file>elements/TransferData.qml</file>
         <file>elements/Protocol.qml</file>
+        <file>elements/ProtocolArea.qml</file>
     </qresource>
 </RCC>

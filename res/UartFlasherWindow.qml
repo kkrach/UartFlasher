@@ -24,8 +24,9 @@ ApplicationWindow {
     // Functions
     //
     function performConnectRequest() {
-        connectRequested(transferDataGroup.transferDataUrl, settingsGroup.comPort, settingsGroup.baudRate, settingsGroup.dataBits,
-                         settingsGroup.parity, settingsGroup.crc, settingsGroup.trigger, settingsGroup.answer);
+        connectRequested(transferDataGroup.transferDataUrl, settingsGroup.comPort, settingsGroup.baudRate,
+                         settingsGroup.dataBits, settingsGroup.parity, settingsGroup.crc, settingsGroup.trigger,
+                         settingsGroup.answer);
     }
 
     //
@@ -38,7 +39,7 @@ ApplicationWindow {
         settingsGroup.comPortModelUpdateRequested.connect(comPortModelUpdateRequested)
         transferDataGroup.connectRequested.connect(performConnectRequest)
         transferDataGroup.disconnectRequested.connect(disconnectRequested)
-        asciiProtocol.sendRequested.connect(sendRequested);
+        comProtocol.sendRequested.connect(sendRequested);
 
         visible = true
     }
@@ -49,19 +50,19 @@ ApplicationWindow {
     Connections {
         target: serialConnection
         onDataReceived: {
-            asciiProtocol.appendText( data );
+            comProtocol.appendText( data );
         }
         onErrorOccurred: {
-            asciiProtocol.appendLine( qsTr("ERROR: ") + data );
+            comProtocol.appendLine( qsTr("ERROR: ") + data );
         }
         onStatusUpdated: {
-            asciiProtocol.appendLine( qsTr("STATUS: ") + data );
+            comProtocol.appendLine( qsTr("STATUS: ") + data );
         }
         onStatusChanged: {
             switch( status )
             {
             case SerialConnection.UNKNOWN:
-                asciiProtocol.appendLine( qsTr("ERROR: Received unknown status!") );
+                comProtocol.appendLine( qsTr("ERROR: Received unknown status!") );
                 status.text = qsTr( "ERROR" )
                 break;
             case SerialConnection.DISCONNECTED:
@@ -113,7 +114,7 @@ ApplicationWindow {
             }
         }
         Elements.Protocol {
-            id: asciiProtocol
+            id: comProtocol
             Layout.fillHeight: true
             Layout.fillWidth: true
         }

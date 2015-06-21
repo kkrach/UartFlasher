@@ -16,13 +16,42 @@ GroupBox {
     //
     function appendLine( line )
     {
-        protocolField.append( line )
-        protocolField.cursorPosition = protocolField.length
+        asciiProtocol.textArea.append( line )
+        asciiProtocol.textArea.scrollToEnd();
+
+        hexProtocol.textArea.append( line )
+        hexProtocol.textArea.scrollToEnd();
     }
     function appendText( text )
     {
-        protocolField.insert( protocolField.length, text )
-        protocolField.cursorPosition = protocolField.length
+        asciiProtocol.textArea.insertAtEnd( text )
+        //asciiProtocol.textArea.scrollToEnd();
+
+        hexProtocol.textArea.insertAtEnd( convertToHex(text) )
+        //hexProtocol.textArea.scrollToEnd();
+    }
+    function convertToHex( text )
+    {
+        var hexLine = ""
+        for( var i = 0, len = text.length; i < len; i++ ) {
+            var charCode = text.charCodeAt(i)
+            if( charCode === 0x20 ) { // SPACE
+                hexLine += " "
+            }
+            if( charCode === 0x0A ) { // NEW LINE
+                hexLine += "↵\n"
+            }
+            if( charCode === 0x0D ) { // CARRIAGE RETURN
+                hexLine += "←"
+            }
+            else {
+                var hexCode = charCode.toString(16)
+                for( var l=hexCode.length; l < 2; l++ )
+                    hexCode = "0" + hexCode;
+                hexLine += hexCode
+            }
+        }
+        return hexLine.toUpperCase();
     }
 
     //
@@ -30,15 +59,32 @@ GroupBox {
     //
     ColumnLayout {
         anchors.fill: parent
-        TextArea {
-            id: protocolField
-            anchors.margins: 0
-            implicitWidth: 400
-            readOnly: true
-            font.family: "courier new"
-            font.pixelSize: 13
-            Layout.fillHeight: true
+        TabView {
             Layout.fillWidth: true
+            Layout.fillHeight: true
+            Tab {
+                id: asciiProtocol
+                title: qsTr( "ASCII" )
+                property Item textArea: item
+                active: true
+
+
+                ProtocolArea {
+                    //id: hexField
+                    implicitWidth: 400
+                }
+            }
+            Tab {
+                id: hexProtocol
+                title: qsTr( "Hexadecimal" )
+                property Item textArea: item
+                active: true
+
+                ProtocolArea {
+                    //id: hexField
+                    implicitWidth: 400
+                }
+            }
         }
         RowLayout {
             TextField {
