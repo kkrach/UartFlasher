@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 
     // QML must be loaded after the context properties are set, otherwise they
     // cannot be used in the QML
-    engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
+    engine.load(QUrl(QStringLiteral("qrc:///UartFlasherWindow.qml")));
 
     for( const QObject* rootObject : engine.rootObjects() )
     {
